@@ -2,5 +2,6 @@
 2. Add config file support
 3. Add config vaiables for @ORANGERED, USERNAME, USERNAME2, and feeder subreddit
 4. Add configuration for the orangered megathread
+5. Add options to disable USERNAME2, @ORANGERED, feeder subreddit, and orangered megathread
 5. Release as bravery 4
 6. Write up everything
