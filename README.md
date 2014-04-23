@@ -1,7 +1,10 @@
 survivalofthebravest
 ====================
 
-***THE ENGLISH MAJOR'S GUIDE TO WRITING BRAVERY RULES***
+A fork of the bravery bot project that can be easily used to create a reddit bot, without writing your own code to parse reddit.
+Currently unfinished.
+
+*THE ENGLISH MAJOR'S GUIDE TO WRITING BRAVERY RULES*
 (lel, DAE STEM?)
 
 This bot is written in Python.
