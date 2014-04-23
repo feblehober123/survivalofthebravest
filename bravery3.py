@@ -6,13 +6,14 @@ import string
 import re
 from collections import deque
 import sys
+from ConfigParser import ConfigParser
 
+parser = ConfigParser()
+parser.read('config.conf')
 
-from password import PASSWORD
-
-
-USERNAME = "SEE_ME_EVERYWHERE"
-USERNAME2 = "WhateverItIs"
+USERNAME = parser.get('AccountInfo', 'username')
+USERNAME2 = parser.get('AccountInfo', 'username2')
+PASSWORD = parser.get('AccountInfo', 'password')
 
 ######################################################################
 ####################### BEGIN BRAVERY RULES. #########################
