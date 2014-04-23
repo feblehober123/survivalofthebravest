@@ -1,0 +1,5 @@
+1. Add rule importer in bravery 3
+2. Add config file support
+3. Add config vaiables for @ORANGERED, USERNAME, USERNAME2, and feeder subreddit
+4. Release as bravery 4
+5. Write up everything
