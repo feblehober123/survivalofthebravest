@@ -101,25 +101,6 @@ def botConversationListener(comment,body):
 	return None
 
 
-
-bjClipboard = ""
-#This rule brought to you by: /u/SOTB-human
-def bjCopyPaste(comment, body):
-	global bjClipboard
-	if random.randint(0,5)==1:
-		if bjClipboard == "":
-			#Get a new copypaste.
-			bjClipboard = body
-			print "Copied Braveryjerk comment for later use"
-			return None
-		else:
-			#Release the copypaste.
-			response = bjClipboard
-			bjClipboard = ""
-			return (response, comment)
-	return None
-
-
 # helper function
 def ruleResponsibleForCommentWithID(commentID):
 	for ruleName in repliesWeveMade:
