@@ -6,20 +6,28 @@ import string
 import re
 from collections import deque
 import sys
-from ConfigParser import ConfigParser
+import os
+from ConfigParser import SafeConfigParser
 
-parser = ConfigParser()
-parser.read('config.conf')
+config = SafeConfigParser()
+config.read('bravery.conf')
 
-USERNAME = parser.get('AccountInfo', 'username')
-USERNAME2 = parser.get('AccountInfo', 'username2')
-PASSWORD = parser.get('AccountInfo', 'password')
+USERNAME = config.get('AccountInfo', 'username')
+USERNAME2 = config.get('AccountInfo', 'username2')
+PASSWORD = config.get('AccountInfo', 'password')
 
 ######################################################################
 ####################### BEGIN BRAVERY RULES. #########################
 
 #Will import all rules from /rules
-
+ruledir = os.listdir('./rules')
+for item in ruledir:
+    if item[-3:] == '.py':    #determines if file is a python script
+        try:
+            execfile(item)    #executes all the code in the file
+        except Exception, ex:    #if error in the code, say so
+            print 'There was an error when parsing rule file '+item
+            print 'Try debugging the file and try again.'
 ######################## END BRAVERY RULES. ##########################
 ######################################################################
 
@@ -31,61 +39,11 @@ PASSWORD = parser.get('AccountInfo', 'password')
 ######################################################################
 ##################### BEGIN CONFIGURATION LISTS ######################
 
+#imports comment rule list from config
+listOfCommentRules = {eval(rule):rule    for rule in config.get('Rules', 'CommentRules').replace(" ","").split(",")}
 
-listOfCommentRules = { #Rules to apply to comments.
-	notWTF:"notWTF",
-	oneTrueGod:"oneTrueGod",
-	sarahJessicaParker:"sarahJessicaParker",
-	murica:"murica",
-	#hello_timmie:"hello_timmie",
-	breadsticks:"breadsticks",
-	penisEnlargementPill:"penisEnlargementPill",
-	Hello:"Hello",
-	winningArgument:"winningArgument",
-	leSexual:"leSexual",
-	ilovemales:"ilovemales",
-	middleschool:"middleschool",
-	sofuckingedgy:"sofuckingedgy",
-	republicansAreEvil:"republicansAreEvil",
-	#botConversationInitiator:"botConversationInitiator",
-	#botLogic:"botLogic",
-	#botConversationListener:"botConversationListener",
-	bjCopyPaste:"bjCopyPaste",
-	orangeredViewer:"orangeredViewer",
-	itsNotUnusual:"itsNotUnusual",
-	leHacked:"leHacked",
-	philosophyWithTim:"philosophyWithTim",
-	hodor:"hodor",
-	nineGag:"nineGag",
-	riskyClickVideo:"riskyClickVideo",
-	riskyClickImage:"riskyClickImage",
-	trollhunter:"trollhunter",
-	whoosh:"whoosh",
-	karmatrain:"karmatrain",
-	donniedarko:"donniedarko",
-	cumpants:"cumpants",
-	notspacedicks:"notspacedicks",
-	leXKCD:"leXKCD",
-	validArgument:"validArgument",
-	freeButler:"freeButler",
-	botAlert:"botAlert",
-	alot:"alot",
-	noWords:"noWords",
-	religion:"religion",
-	niggersRebooted:"niggersRebooted",
-	instructionsUnclear:"instructionsUnclear"
-}
-#listOfCommentRules = {
-#	orangeredViewer:"orangeredViewer"
-#}
-
-listOfSubmissionRules = { #Rules to apply to submissions.
-	levelLevel:"levelLevel",
-	leGem:"leGem",
-	favoriteSubreddit:"favoriteSubreddit",
-	canada:"canada",
-	modeveryonecj:"modeveryonecj"
-}
+#imports submission rule list from config
+listOfSubmissionRules = {eval(rule):rule    for rule in config.get('Rules', 'SumissionRules').replace(""," ").split(",")}
 
 
 # List of subreddits to check all rules in.
