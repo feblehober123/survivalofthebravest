@@ -47,7 +47,7 @@ for rule in config.get('Rules', 'CommentRules').strip().split(","):
     try:
         listOfCommentRules[eval(rule)] = rule
     except NameError:
-        print 'Error when loading comment rule \''+rule+'\'. Check if the containing rule file was parsed sucessfully'
+        print 'Warning: unable to load comment rule \''+rule+'\'. Check if the containing rule file was parsed sucessfully'
 
 #imports submission rule list from config
 listOfSubmissionRules = {}
@@ -55,7 +55,7 @@ for rule in config.get('Rules', 'SumissionRules').strip().split(","):
     try:
         listOfSubmissionRules[eval(rule)] = rule
     except NameError:
-        print 'Error when loading submission rule \''+rule+'\'. Check if the containing rule file was parsed sucessfully'
+        print 'Warning: unable to load submission rule \''+rule+'\'. Check if the containing rule file was parsed sucessfully'
 
 # List of subreddits to check all rules in.
 trackingSubreddits = config.get('Subreddits', 'TrackingSubreddits').strip().split(",")
@@ -84,7 +84,7 @@ for rule in config.get('Rules', 'MetaRule1Exemptions').strip().split(","):
     try:
         metaRule1Exemptions.append(eval(rule))
     except NameError:
-        print 'Error when parsing Meta-rule 1 exemptions: rule \''+rule+'\' does not exist.'
+        print 'Warning: non-existent rule \''+rule+'\' in Meta-rule 1 exemptions.'
 
 #Allow these rules to reply to the bot itself, or to users in usersWeveRepliedTo.
 metaRule2Exemptions = []
@@ -92,7 +92,7 @@ for rule in config.get('Rules', 'MetaRule2Exemptions').strip().split(","):
     try:
         metaRule1Exemptions.append(eval(rule))
     except NameError:
-        print 'Error when parsing Meta-rule 2 exemptions: rule \''+rule+'\' does not exist.'
+        print 'Warning: non-existent rule \''+rule+'\' in Meta-rule 2 exemptions.'
 
 metaRule2Whitelist = config.get('Rules', 'MetaRule2Whitelist').strip().split(",")
 
