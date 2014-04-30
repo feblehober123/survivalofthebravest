@@ -14,6 +14,7 @@ config.read('bravery.conf')
 
 USERNAME = config.get('AccountInfo', 'username')
 USERNAME2 = config.get('AccountInfo', 'username2')
+META_USERNAME = config.get('AccountInfo', 'MetaUsername')
 PASSWORD = config.get('AccountInfo', 'password')
 
 ######################################################################
@@ -94,12 +95,12 @@ for rule in config.get('Rules', 'MetaRule2Exemptions').strip().split(","):
 
 metaRule2Whitelist = config.get('Rules', 'MetaRule2Whitelist').strip().split(",")
 
-throttlingExemptions = config.get('Rules', 'ThrottlingExemptions').strip().split(",")
+throttlingExemptions = config.get('Rules', 'ThrottlingExemptions').strip.split(",")
 
-DELETION_DELAY = config.get('Rules', 'DeletionDelay').strip().split(",") #In seconds.
+DELETION_DELAY = config.get('Rules', 'DeletionDelay') #In seconds.
 # After the specified delay, a comment must have AT LEAST this
 # much karma in order to escape deletion.
-DEFAULT_DELETION_THRESHOLD = config.get('Rules', 'DefaultDeletionThreshold').strip().split(",")
+DEFAULT_DELETION_THRESHOLD = config.get('Rules', 'DefaultDeletionThreshold')
 
 deletionThresholds = {}
 for rule in listOfCommentRules.update(listOfSubmissionRules):
@@ -386,7 +387,7 @@ def checkSubreddit(sr, isCommentTracker):
 			i = 0
 			for x in posts:
 				i+=1
-				if type(x).__name__ == "Comment" and str(x.author)!="SOTB-bot":
+				if type(x).__name__ == "Comment" and str(x.author)!=META_USERNAME:
 					postsList.append(x)
 				if i>10 or x.id == ph:
 					break
