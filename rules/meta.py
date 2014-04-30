@@ -40,65 +40,65 @@ def forceComment(text, thingToReplyTo, registration="!UNKNOWN"):
 	return None
 
 
-
-# Restrict to @ORANGERED
-# Bypasses meta-rules, because it doesn't actually make any comments.
-def botLogic(comment, body):
-	lc = body.lower()
-	if " bot " in lc or " bot?" in lc or " bot," in lc or " bot." in lc or " bot!" in lc or "bot logic" in lc or "automated" in lc:
-		accuser = str(comment.author)
-		if accuser != USERNAME:
-			for tailID in botConversations:
-				if botConversations[tailID] and accuser in botConversations[tailID]:
-					#This may be a little too strict.
-					print "Bot accuser is already participating in a conversation elsewhere."
-					return None
-			print "Bot accusation detected. Initiate a conversation at the next opportunity."
-			botAccusations.append((comment,body))
-	return None
-
-
-# Set a very low initial throttling factor so that this
-# takes one or two rounds to be invoked.
-def botConversationInitiator(comment,body):
-	if (False or random.randint(0,1000) == 1) and botAccusations:
-		(c,b) = botAccusations[0]
-		# Don't initiate the conversation in the same thread,
-		# and don't do it to ourselves (which would be really bad).
-		# Also, don't do it to the same person who made the accusation.
-		tailAuthor = str(comment.author)
-		headAuthor = str(c.author) #The username of the accuser.
-		if c.submission != comment.submission and tailAuthor!=USERNAME and tailAuthor!=headAuthor:
-			successfulComment = forceComment(b,comment,"botConversationInitiator")
-			if successfulComment:
-				botConversations[successfulComment.id] = [tailAuthor, c, headAuthor]
-				dumpBotConversations()
-				botAccusations.popleft()
-	return None
-
-
-
-# Restrict to @ORANGERED
-# If someone replies to a bot accusation conversation, continue the conversation.
-# This rule bypasses the normal comment regulators.
-def botConversationListener(comment,body):
-	tailID = comment.parent_id[3:]
-	if tailID in botConversations:
-		#Someone just replied to our end of the bot conversation!
-		information = botConversations[tailID]
-		tailAuthor = information[0]
-		headComment = information[1]
-		headAuthor = information[2]
-		thisCommentAuthor = str(comment.author)
-		if thisCommentAuthor == tailAuthor:
-			successfulComment = forceComment(body, headComment, "botConversationListener")
-			if successfulComment:
-				botConversations[tailID] = None
-				botConversations[successfulComment.id] = [headAuthor,comment,thisCommentAuthor]
-				dumpBotConversations()
-		else:
-			print "this isn't part of the bot conversation because it's not by the same person."
-	return None
+if config.get('BotAccusations', 'Enabled'): 	#only define if enabled
+    # Restrict to @ORANGERED
+    # Bypasses meta-rules, because it doesn't actually make any comments.
+    def botLogic(comment, body):
+    	lc = body.lower()
+    	if " bot " in lc or " bot?" in lc or " bot," in lc or " bot." in lc or " bot!" in lc or "bot logic" in lc or "automated" in lc:
+    		accuser = str(comment.author)
+    		if accuser != USERNAME:
+    			for tailID in botConversations:
+    				if botConversations[tailID] and accuser in botConversations[tailID]:
+    					#This may be a little too strict.
+    					print "Bot accuser is already participating in a conversation elsewhere."
+    					return None
+    			print "Bot accusation detected. Initiate a conversation at the next opportunity."
+    			botAccusations.append((comment,body))
+    	return None
+    
+    
+    # Set a very low initial throttling factor so that this
+    # takes one or two rounds to be invoked.
+    def botConversationInitiator(comment,body):
+    	if (False or random.randint(0,1000) == 1) and botAccusations:
+    		(c,b) = botAccusations[0]
+    		# Don't initiate the conversation in the same thread,
+    		# and don't do it to ourselves (which would be really bad).
+    		# Also, don't do it to the same person who made the accusation.
+    		tailAuthor = str(comment.author)
+    		headAuthor = str(c.author) #The username of the accuser.
+    		if c.submission != comment.submission and tailAuthor!=USERNAME and tailAuthor!=headAuthor:
+    			successfulComment = forceComment(b,comment,"botConversationInitiator")
+    			if successfulComment:
+    				botConversations[successfulComment.id] = [tailAuthor, c, headAuthor]
+    				dumpBotConversations()
+    				botAccusations.popleft()
+    	return None
+    
+    
+    
+    # Restrict to @ORANGERED
+    # If someone replies to a bot accusation conversation, continue the conversation.
+    # This rule bypasses the normal comment regulators.
+    def botConversationListener(comment,body):
+    	tailID = comment.parent_id[3:]
+    	if tailID in botConversations:
+    		#Someone just replied to our end of the bot conversation!
+    		information = botConversations[tailID]
+    		tailAuthor = information[0]
+    		headComment = information[1]
+    		headAuthor = information[2]
+    		thisCommentAuthor = str(comment.author)
+    		if thisCommentAuthor == tailAuthor:
+    			successfulComment = forceComment(body, headComment, "botConversationListener")
+    			if successfulComment:
+    				botConversations[tailID] = None
+    				botConversations[successfulComment.id] = [headAuthor,comment,thisCommentAuthor]
+    				dumpBotConversations()
+    		else:
+    			print "this isn't part of the bot conversation because it's not by the same person."
+    	return None
 
 
 # helper function
@@ -111,13 +111,14 @@ def ruleResponsibleForCommentWithID(commentID):
 	return "!NONE"
 
 
-
-rBot = praw.Reddit(user_agent="Bravery bot 3.0 utility handler by /u/SOTB-bot")
-rBot.login(username="SOTB-bot", password=PASSWORD)
-
-
-orangeredMegathread = praw.objects.Submission.from_url(rBot, "http://www.reddit.com/r/SurvivalOfTheBravest/comments/1hk7a5/orangered_megathread_3/")
-def orangeredViewer(comment, body):
-	ruleName = ruleResponsibleForCommentWithID(comment.parent_id[3:])
-	preface = "["+str(comment.author)+" responds to "+ruleName+"]("+comment.permalink+"?context=1):\n\n---\n\n"
-	return (preface+body, orangeredMegathread)
+if META_USERNAME:
+	rBot = praw.Reddit(user_agent="Bravery bot 3.0 utility handler by /u/"+META_USERNAME)
+	rBot.login(username=META_USERNAME, password=PASSWORD)
+	
+	megathreadURL = config.get('OrangeredViewer', 'MegathreadURL')
+	if megathreadURL:
+    	orangeredMegathread = praw.objects.Submission.from_url(rBot, megathreadURL)
+    	def orangeredViewer(comment, body):
+    		ruleName = ruleResponsibleForCommentWithID(comment.parent_id[3:])
+    		preface = "["+str(comment.author)+" responds to "+ruleName+"]("+comment.permalink+"?context=1):\n\n---\n\n"
+    		return (preface+body, orangeredMegathread)
