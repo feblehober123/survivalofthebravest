@@ -16,6 +16,7 @@ USERNAME = config.get('AccountInfo', 'username')
 USERNAME2 = config.get('AccountInfo', 'username2')
 META_USERNAME = config.get('AccountInfo', 'MetaUsername')
 PASSWORD = config.get('AccountInfo', 'password')
+FEEDER_SUBREDDIT = config.get('FeederSubreddit', 'Subreddit')
 
 ######################################################################
 ####################### BEGIN BRAVERY RULES. #########################
@@ -392,7 +393,7 @@ def checkSubreddit(sr, isCommentTracker):
 				if i>10 or x.id == ph:
 					break
 		else:
-			if sr in bannedSubreddits:
+			if sr in bannedSubreddits and USERNAME2:
 				subreddit = r2.get_subreddit(sr)
 			else:
 				subreddit = r.get_subreddit(sr)
@@ -527,9 +528,9 @@ def splitArrayByElement(array, splitter):
 
 r = praw.Reddit(user_agent="Bravery bot 3.0 by /u/"+USERNAME)
 r.login(username=USERNAME, password=PASSWORD)
-
-r2 = praw.Reddit(user_agent="Bravery bot 3.0 by /u/"+USERNAME2)
-r2.login(username=USERNAME2, password=PASSWORD)
+if USERNAME2:
+    r2 = praw.Reddit(user_agent="Bravery bot 3.0 by /u/"+USERNAME2)
+    r2.login(username=USERNAME2, password=PASSWORD)
 
 botConversations = loadBotConversations()
 
@@ -596,24 +597,24 @@ startTime = time.time()
 #Go!
 while True:
 	print "Start loop."
-
-	try:
-		feeder = rBot.get_subreddit("SurvivalOfTheBravest")
-		posts = feeder.get_new(place_holder=feederPlaceholder,limit=40)
-		postsList = [s for s in posts]
-
-		feederPlaceholder = postsList[0].id
-		postsList = postsList[:-1]
-		postsList.reverse()
-
-		print "Got " + str(len(postsList)) + " posts from the feeder."
-
-		for post in postsList:
-			processFeeder(post)
-
-		print "Done with feeder."
-	except Exception, ex:
-		print "An exception occurred while processing the feeder:", ex
+	if FEEDER_SUBREDDIT and META_USERNAME:
+    	try:
+    		feeder = rBot.get_subreddit(FEEDER_SUBREDDIT)
+    		posts = feeder.get_new(place_holder=feederPlaceholder,limit=40)
+    		postsList = [s for s in posts]
+    
+    		feederPlaceholder = postsList[0].id
+    		postsList = postsList[:-1]
+    		postsList.reverse()
+    
+    		print "Got " + str(len(postsList)) + " posts from the feeder."
+    
+    		for post in postsList:
+    			processFeeder(post)
+    
+    		print "Done with feeder."
+    	except Exception, ex:
+    		print "An exception occurred while processing the feeder:", ex
 	dumpMemory()
 
 
