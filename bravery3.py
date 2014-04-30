@@ -24,7 +24,7 @@ ruledir = os.listdir('./rules')
 for item in ruledir:
     if item[-3:] == '.py':    #determines if file is a python script
         try:
-            execfile(item)    #executes all the code in the file
+            execfile('./rules/'+item)    #executes all the code in the file
         except Exception, ex:    #if error in the code, say so
             print 'There was an error when parsing rule file '+item
             print 'Try debugging the file and try again.'
@@ -40,115 +40,74 @@ for item in ruledir:
 ##################### BEGIN CONFIGURATION LISTS ######################
 
 #imports comment rule list from config
-listOfCommentRules = {eval(rule):rule    for rule in config.get('Rules', 'CommentRules').replace(" ","").split(",")}
+listOfCommentRules = {}
+for rule in config.get('Rules', 'CommentRules').strip().split(","):
+    try:
+        listOfCommentRules[eval(rule)] = rule
+    except NameError:
+        print 'Error when loading comment rule \''+rule+'\'. Check if the containing rule file was parsed sucessfully'
 
 #imports submission rule list from config
-listOfSubmissionRules = {eval(rule):rule    for rule in config.get('Rules', 'SumissionRules').replace(""," ").split(",")}
-
+listOfSubmissionRules = {}
+for rule in config.get('Rules', 'SumissionRules').strip().split(","):
+    try:
+        listOfSubmissionRules[eval(rule)] = rule
+    except NameError:
+        print 'Error when loading submission rule \''+rule+'\'. Check if the containing rule file was parsed sucessfully'
 
 # List of subreddits to check all rules in.
-trackingSubreddits = [
-	"pics",			#BANNED
-	"funny",		#BANNED
-	"politics",		#BANNED
-	"gaming",
-	"askreddit",	#BANNED
-	"videos",		#BANNED
-	"iama",
-	"wtf",
-	"aww",			#BANNED
-	"atheism",		#BANNED
-	"AdviceAnimals",#BANNED
-	"todayilearned",#BANNED
-	"circlejerk",
-	"magicskyfairy",
-	"atheismrebooted",#BANNED
-	"Braveryjerk",
-	"SOTBMeta",
-	"lounge",
-	"news",
-	"rage",
-	"cringe",
-	"cringepics",	#BANNED
-	"facepalm",
-	"books",
-	"earthporn",
-	"explainlikeimfive",
-	"gifs",
-	"television"
-	#"test",
-]
+trackingSubreddits = config.get('Subreddits', 'TrackingSubreddits').strip().split(",")
 
 #Will be managed by r2 instead:
-bannedSubreddits = [
-	"pics",
-	"funny",
-	"politics",
-	"askreddit",
-	"videos",
-	"aww",
-	"atheism",
-	"AdviceAnimals",
-	"todayilearned",
-	"atheismrebooted",
-	"cringepics",
-]
+bannedSubreddits = config.get('Subredddits', 'BannedSubreddits').strip().split(",")
 
 # These subreddits will not be checked by any rules EXCEPT those which explicitly
 # say so in subredditRestrictions.
-# "@ORANGERED" is a pseudo-subreddit that represents the feed of replies to our own comments.
-specialSubreddits = [
-	"@ORANGERED"
-]
+specialSubreddits = config.get('Subreddits', 'SpecialSubreddits').strip().split(",")
 
 # Every rule listed here will be applied only to comments or submissions in the
 # subreddits listed next to it. Rules not listed here will be applied to all
 # subreddits in trackingSubreddits.
-subredditRestrictions = {
-	republicansAreEvil:["test","politics"],
-	notWTF:["test","wtf"],
-	hello_timmie:["Braveryjerk"],
-	botLogic:["@ORANGERED"],
-	botConversationListener:["@ORANGERED"],
-	bjCopyPaste:["Braveryjerk"],
-	orangeredViewer:["@ORANGERED"],
-	botAlert:["@ORANGERED"],
-	modeveryonecj:["circlejerk"]
-}
-
+subredditRestrictions = {}
+for rule in listOfCommentRules.update(listOfSubmissionRules):
+    try:
+        #this gets the rule's section and subreddit restrictions, and stores them in the dictionary
+        subredditRestrictions[rule] = config.get(listOfCommentRules.update(listOfSubmissionRules)[rule], 'SubredditRestrictions').strip().split(",")
+    except Exception:
+        pass
 
 #Allow these rules to apply more than once in a single thread.
-metaRule1Exemptions = [
-	orangeredViewer,
-	freeButler
-]
+metaRule1Exemptions = []
+for rule in config.get('Rules', 'MetaRule1Exemptions').strip().split(","):
+    try:
+        metaRule1Exemptions.append(eval(rule))
+    except NameError:
+        print 'Error when parsing Meta-rule 1 exemptions: rule \''+rule+'\' does not exist.'
 
 #Allow these rules to reply to the bot itself, or to users in usersWeveRepliedTo.
-metaRule2Exemptions = [
-	orangeredViewer,
-	bjCopyPaste,
-	hello_timmie,
-	Hello,
-	philosophyWithTim
-]
+metaRule2Exemptions = []
+for rule in config.get('Rules', 'MetaRule2Exemptions').strip().split(","):
+    try:
+        metaRule1Exemptions.append(eval(rule))
+    except NameError:
+        print 'Error when parsing Meta-rule 2 exemptions: rule \''+rule+'\' does not exist.'
 
-metaRule2Whitelist = [
-	"SOTB-human"
-]
+metaRule2Whitelist = config.get('Rules', 'MetaRule2Whitelist').strip().split(",")
 
-throttlingExemptions = [
-	"orangeredViewer",
-	"freeButler",
-	"botAlert"
-]
+throttlingExemptions = config.get('Rules', 'ThrottlingExemptions').strip().split(",")
 
-DELETION_DELAY = 10*60 #In seconds.
+DELETION_DELAY = config.get('Rules', 'DeletionDelay').strip().split(",") #In seconds.
 # After the specified delay, a comment must have AT LEAST this
 # much karma in order to escape deletion.
-DEFAULT_DELETION_THRESHOLD = 0
-deletionThresholds = {
-	"notWTF": 2
-}
+DEFAULT_DELETION_THRESHOLD = config.get('Rules', 'DefaultDeletionThreshold').strip().split(",")
+
+deletionThresholds = {}
+for rule in listOfCommentRules.update(listOfSubmissionRules):
+    try:
+        #this gets the rule's section and deletion threashold, and stores them in the dictionary
+        deletionThreasholds[rule.__name__] = config.get(listOfCommentRules.update(listOfSubmissionRules)[rule], 'DeletionThreshold')
+    except Exception:
+        pass
 
 ###################### END CONFIGURATION LISTS #######################
 ######################################################################
