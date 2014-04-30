@@ -1,5 +1,4 @@
 #Meta-rules (and meta code) to make some things work.
-#May be removing some of the more specialised rules later, such as orangered megathread.
 
 
 # Helper function:
@@ -117,8 +116,11 @@ if META_USERNAME:
 	
 	megathreadURL = config.get('OrangeredViewer', 'MegathreadURL')
 	if megathreadURL:
-    	orangeredMegathread = praw.objects.Submission.from_url(rBot, megathreadURL)
-    	def orangeredViewer(comment, body):
-    		ruleName = ruleResponsibleForCommentWithID(comment.parent_id[3:])
-    		preface = "["+str(comment.author)+" responds to "+ruleName+"]("+comment.permalink+"?context=1):\n\n---\n\n"
-    		return (preface+body, orangeredMegathread)
+    	    orangeredMegathread = praw.objects.Submission.from_url(rBot, megathreadURL)
+
+def orangeredViewer(comment, body):
+    if not megathreadURL:
+        return None    #quit if rule is diabled
+	ruleName = ruleResponsibleForCommentWithID(comment.parent_id[3:])
+	preface = "["+str(comment.author)+" responds to "+ruleName+"]("+comment.permalink+"?context=1):\n\n---\n\n"
+	return (preface+body, orangeredMegathread)
